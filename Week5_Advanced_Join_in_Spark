@@ -1,0 +1,35 @@
+show_views_file = sc.textfile("/user/cloudera/input_4_0/join2_gennum?.txt")
+show_views_file.take(2)
+
+def split_show_views(line):
+    show, views = line.strip().split(",")
+    views = int(views)
+    return (show, views)
+
+show_views = show_views_file.map(split_show_views)
+
+show_channel_file = sc.textFile("/user/cloudera/input_4_0/join2_genchan?.txt")
+
+def split_show_channel(line):
+    show, channel = line.strip(",").split()
+    return (show, channel)
+
+show_channel = show_channel_file.map(split_show_channel)
+
+joined_dataset = show_channel.join(show_views)
+
+def some_function(a, b):
+    some_result = a + b
+    return some_result
+
+def extract_channel_views(line):
+    channel, views = line[1][0], line[1][1]
+    return (channel, views)
+
+channel_views = joined_dataset.map(extract_channel_views)
+
+channel_views.reduceByKey(some_function).collect()
+
+
+
+
